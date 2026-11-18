@@ -6,12 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { readJSON, writeJSON, session, store, KEYS } from '../../../shared/lib/storage.js';
 import { useAuth } from '../../../shared/hooks/useAuth.jsx';
 import { useOnReturn } from '../../../shared/hooks/useOnReturn.js';
-import {
-  loadUserData,
-  saveProfile,
-  saveCompletions,
-  recordVisit,
-} from '../../../shared/lib/userData.js';
+import { loadUserData, saveProfile, saveCompletions } from '../../../shared/lib/userData.js';
 import { mergeProfile, actionsToRows } from '../../../shared/logic/syncProgress.js';
 import {
   validProfile,
@@ -85,11 +80,6 @@ export function useProfile(roleIds, libraryRoleFor) {
   // On sign-in, and whenever the person comes back to this tab.
   useEffect(() => {
     pull();
-    // Count one visit per browser session for the signed-in person (14-day return metric).
-    if (userId && session.get(KEYS.accountVisit) !== userId) {
-      session.set(KEYS.accountVisit, userId);
-      recordVisit();
-    }
     // pull reads the latest profile through a ref; runs once per sign-in.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);

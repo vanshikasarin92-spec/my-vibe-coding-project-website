@@ -138,6 +138,10 @@ Artifact pages can't make network requests to outside services, so `npm run buil
 
 ## Hosting
 
-The build is a static folder with relative asset paths, so it can be served from any path. SharePoint Online doesn't serve uploaded `.html` files as pages by default, so host `dist/` on an internal static host (for example Azure Static Web Apps or an internal web server) and link to it from SharePoint, or wrap it in a SharePoint Framework (SPFx) web part.
+**Live site:** https://vanshikasarin92-spec.github.io/my-vibe-coding-project-website/ (GitHub Pages, from the `gh-pages` branch of this repository).
+
+To deploy a new version: `npm run build`, then commit the contents of `dist/` (plus an empty `.nojekyll` file) to the `gh-pages` branch. Asset paths are relative, so the same build also works on any static host or inside a SharePoint Framework (SPFx) web part.
+
+Supabase settings for this address (Authentication in the Supabase dashboard): set the **Site URL** to the live site and add it under **Redirect URLs**, so confirmation emails return people to the hub. Supabase's built-in email sender only delivers to members of the Supabase team; add custom SMTP, or turn off "Confirm email", before colleagues sign up.
 
 Guidance, not legal advice: confirm which Accessible Canada Act obligations apply with Legal and the Accessibility office.

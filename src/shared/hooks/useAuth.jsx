@@ -3,6 +3,8 @@
 // 'signed-in' or 'signed-out' ('unavailable' when Supabase isn't configured).
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase.js';
+import { session, KEYS } from '../lib/storage.js';
+import { recordVisit } from '../lib/userData.js';
 
 const AuthContext = createContext({ status: 'unavailable', user: null });
 
@@ -31,6 +33,15 @@ export function AuthProvider({ children }) {
       data.subscription.unsubscribe();
     };
   }, []);
+
+  // Count one visit per browser session for each signed-in person, on any page
+  // (visits table; feeds the PRD's 14-day return measure).
+  const userId = state.user ? state.user.id : null;
+  useEffect(() => {
+    if (!userId || session.get(KEYS.accountVisit) === userId) return;
+    session.set(KEYS.accountVisit, userId);
+    recordVisit();
+  }, [userId]);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;
 }
