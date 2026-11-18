@@ -23,6 +23,13 @@ export function authErrorCode(error) {
     return 'badLogin';
   if (code === 'email_not_confirmed' || msg.includes('email not confirmed')) return 'notConfirmed';
   if (code === 'user_already_exists' || msg.includes('already registered')) return 'exists';
+  if (code === 'email_address_invalid' || msg.includes('is invalid')) return 'emailRejected';
+  if (
+    code === 'email_address_not_authorized' ||
+    msg.includes('sending confirmation email') ||
+    msg.includes('not authorized')
+  )
+    return 'emailNotSent';
   if (code === 'weak_password' || msg.includes('password should')) return 'weakPassword';
   if (error.status === 429 || code.includes('rate_limit') || msg.includes('rate limit'))
     return 'rateLimited';

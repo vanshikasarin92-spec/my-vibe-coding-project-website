@@ -21,6 +21,19 @@ test('Supabase errors map to plain messages', () => {
   );
   assert.equal(authErrorCode({ message: 'Email not confirmed' }), 'notConfirmed');
   assert.equal(authErrorCode({ message: 'User already registered' }), 'exists');
+  assert.equal(
+    authErrorCode({
+      code: 'email_address_invalid',
+      message: 'Email address "x@example.com" is invalid',
+    }),
+    'emailRejected',
+  );
+  assert.equal(authErrorCode({ message: 'Error sending confirmation email' }), 'emailNotSent');
+  assert.equal(
+    authErrorCode({ code: 'over_email_send_rate_limit', message: 'email rate limit exceeded' }),
+    'rateLimited',
+  );
+  assert.equal(authErrorCode({ code: 'timeout', message: 'Network request timed out' }), 'network');
   assert.equal(authErrorCode({ status: 429, message: 'x' }), 'rateLimited');
   assert.equal(authErrorCode({ message: 'Failed to fetch' }), 'network');
   assert.equal(authErrorCode({ message: 'something else' }), 'unknown');

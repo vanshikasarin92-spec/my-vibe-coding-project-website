@@ -24,7 +24,10 @@ export const ACCOUNT_COPY = {
     notConfirmed: 'Confirm your email first: open the link we sent you, then log in.',
     exists: 'There is already an account with that email. Log in instead.',
     weakPassword: 'Choose a longer or less common password.',
-    rateLimited: 'Too many attempts. Wait a minute and try again.',
+    rateLimited: 'Too many attempts right now. Wait a few minutes and try again.',
+    emailRejected: "That email address can't be used to sign up. Use your work email address.",
+    emailNotSent:
+      "We couldn't send the confirmation email, so the account wasn't created. Try again later, or contact the hub team.",
     network: "Couldn't reach the server. Check your connection and try again.",
     unknown: 'Something went wrong. Try again.',
   },
