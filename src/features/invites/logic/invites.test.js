@@ -1,7 +1,13 @@
 // Unit tests for invite rules and dashboard figures.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateRecipient, inviteErrorCode, metricTiles, statusLabel } from './invites.js';
+import {
+  validateRecipient,
+  inviteErrorCode,
+  metricTiles,
+  statusLabel,
+  sendOutcome,
+} from './invites.js';
 
 test('recipient checks before sending', () => {
   assert.equal(validateRecipient('', 'me@x.ca'), 'missing');
@@ -46,6 +52,13 @@ test('no invites yet: rate shows a dash, counts show zero', () => {
     metricTiles({ acceptance_rate: '100.0' }).find((t) => t.id === 'rate').value,
     '100%',
   );
+});
+
+test('a retry after a timeout that hits a duplicate means the first try worked', () => {
+  assert.equal(sendOutcome(null, false), 'saved');
+  assert.equal(sendOutcome('duplicate', true), 'savedEarlier');
+  assert.equal(sendOutcome('duplicate', false), 'error');
+  assert.equal(sendOutcome('network', true), 'error');
 });
 
 test('status labels', () => {

@@ -23,6 +23,8 @@ export const INVITES_COPY = {
   send: 'Send invite',
   sending: 'Sending…',
   sent: (email) => `Invite saved for ${email}.`,
+  sentEarlier: (email) =>
+    `Invite saved for ${email}. Your first try got through even though the connection was slow, so nothing was sent twice.`,
   shareHeading: 'Send them this message',
   shareNote:
     "The hub doesn't email invites. Copy this message and send it to your colleague yourself.",

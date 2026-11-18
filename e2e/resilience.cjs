@@ -113,6 +113,25 @@ const hang = () => {}; // a route handler that never answers
   await p.waitForSelector('.inv-table th[scope=row]:has-text("sam@example.com")', { timeout: 10000 });
   ok('Retry sends it once the network is back', s.invites.length === 1);
 
+  // 3b. Slow reply: the invite IS saved, but the answer comes after the hub
+  // stopped waiting (DevTools "Hang" profile). Retry must say saved, not duplicate.
+  await p.route('**/rest/v1/invites', async (r) => {
+    if (r.request().method() !== 'POST') return r.fallback();
+    const email = JSON.parse(r.request().postData()).recipient_email;
+    s.invites.push({ id: s.invites.length + 1, recipient_email: email, status: 'pending', created_at: new Date().toISOString(), responded_at: null });
+    await new Promise((res) => setTimeout(res, 20000));
+    r.fulfill({ status: 201, contentType: 'application/json', body: 'null' }).catch(() => {});
+  });
+  await p.fill('#inv-email', 'slow@example.com');
+  await p.click('button:has-text("Send invite")');
+  await p.waitForSelector('.acc-field button:has-text("Retry")', { timeout: 12000 });
+  ok('slow reply: shows the network error with Retry first', true);
+  await p.unroute('**/rest/v1/invites');
+  await p.click('.acc-field button:has-text("Retry")');
+  await p.waitForSelector('.acc-notice:has-text("first try got through")', { timeout: 10000 }).catch(() => {});
+  ok('slow reply: Retry says the invite was saved, not "already invited"', (await p.textContent('.acc-notice')).includes('first try got through') && !(await p.isVisible('#inv-email-error')), await p.textContent('.acc-notice'));
+  ok('slow reply: still one invite', s.invites.filter((i) => i.recipient_email === 'slow@example.com').length === 1);
+
   // 4. Spam Click: Send invite clicked 5 times fast
   await p.fill('#inv-email', 'lee@example.com');
   const before = s.log.filter((l) => l === 'POST /rest/v1/invites').length;

@@ -132,7 +132,7 @@ Signing in is optional. Without an account everything works as before and is sav
 - **Pagination:** News 5 per page, Resource library 10 per page with group headings kept. Changing page moves focus to the page heading. Rules in `shared/logic/paginate.js`; components in `shared/components/StateViews.jsx`.
 - **Last-write-wins:** role, language and checklist ticks record when the person changed them. On sign-in and whenever the tab regains focus, the app merges with the account and the later edit wins, item by item (`shared/logic/syncProgress.js`). The database enforces the same rule: an update carrying an older `client_updated_at` is ignored (migration `20261117000300_last_write_wins.sql`). Completed actions are only ever added, so both sides are kept.
 - **Tests:** `npm run e2e:states` (31 browser checks, with `npm run preview` running).
-- **No frozen screens:** every network call goes through `src/shared/lib/request.js`. A request that hasn't answered in 8 seconds is aborted and shows an inline error with Retry: reads, sign-in, the saved-session check, sending and cancelling invites, and saving progress. Submit and Cancel buttons take one click at a time. `npm run e2e:resilience` checks all of this (19 checks).
+- **No frozen screens:** every network call goes through `src/shared/lib/request.js`. A request that hasn't answered in 8 seconds is aborted and shows an inline error with Retry: reads, sign-in, the saved-session check, sending and cancelling invites, and saving progress. Submit and Cancel buttons take one click at a time. `npm run e2e:resilience` checks all of this (22 checks).
 
 ## The claude.ai artifact build
 

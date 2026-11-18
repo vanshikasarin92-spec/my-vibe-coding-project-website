@@ -12,6 +12,15 @@ export function validateRecipient(email, selfEmail, alreadyInvited = []) {
   return null;
 }
 
+// A send that timed out may still have reached the database. If the retry for
+// that same address is refused as a duplicate, the first try worked: report it
+// as saved, not as an error.
+export function sendOutcome(code, firstTryWasUnsure) {
+  if (!code) return 'saved';
+  if (code === 'duplicate' && firstTryWasUnsure) return 'savedEarlier';
+  return 'error';
+}
+
 // Turns a Supabase error from sending an invite into a message code.
 export function inviteErrorCode(error) {
   if (!error) return null;

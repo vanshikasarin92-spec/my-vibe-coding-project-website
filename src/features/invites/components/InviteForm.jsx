@@ -7,6 +7,7 @@ export default function InviteForm({ copy, onSend, siteUrl }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [sentTo, setSentTo] = useState(null);
+  const [savedEarlier, setSavedEarlier] = useState(false);
   const [copyStatus, setCopyStatus] = useState('');
   const [attempt, setAttempt] = useState(0);
   const inputRef = useRef(null);
@@ -33,6 +34,7 @@ export default function InviteForm({ copy, onSend, siteUrl }) {
     if (res.ok) {
       setError(null);
       setSentTo(email.trim().toLowerCase());
+      setSavedEarlier(!!res.savedEarlier);
       setEmail('');
     } else {
       setError(res.code);
@@ -78,7 +80,7 @@ export default function InviteForm({ copy, onSend, siteUrl }) {
         </button>
       </form>
       <p className="acc-notice" role="status">
-        {sentTo ? copy.sent(sentTo) : ''}
+        {sentTo ? (savedEarlier ? copy.sentEarlier(sentTo) : copy.sent(sentTo)) : ''}
       </p>
       {sentTo && (
         <div className="inv-share">
