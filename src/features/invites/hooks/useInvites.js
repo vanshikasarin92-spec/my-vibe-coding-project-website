@@ -37,10 +37,12 @@ export function useInvites() {
     return { ok: true };
   }
 
+  // 'ok', 'gone' (no longer pending: accepted or already cancelled) or 'network'.
   async function cancel(id) {
     const { data, error } = await cancelInvite(id);
+    if (error && inviteErrorCode(error) === 'network') return 'network';
     reload();
-    return !error && data === true;
+    return !error && data === true ? 'ok' : 'gone';
   }
 
   return {

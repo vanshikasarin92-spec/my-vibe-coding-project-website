@@ -4,11 +4,11 @@ import { CHECKLISTS } from './data/checklists.js';
 import { useChecklistTicks } from './hooks/useChecklistTicks.js';
 import { useAuth } from '../../shared/hooks/useAuth.jsx';
 import { doneCount, clearTicks } from './logic/progress.js';
-import { EmptyState } from '../../shared/components/StateViews.jsx';
+import { EmptyState, ErrorState } from '../../shared/components/StateViews.jsx';
 
 export default function Checklists() {
   // Ticks are saved in this browser, and to the person's own account when signed in.
-  const [checked, update, syncError] = useChecklistTicks();
+  const [checked, update, syncError, retrySync] = useChecklistTicks();
   const signedIn = useAuth().status === 'signed-in';
   const nothingTicked = CHECKLISTS.every((col) => doneCount(col.items, checked) === 0);
 
@@ -27,10 +27,11 @@ export default function Checklists() {
           {signedIn ? 'Ticks are saved to your account.' : 'Ticks are saved only in your browser.'}
         </p>
         {syncError && (
-          <p className="acc-sync" role="status">
-            Couldn't save to your account. Your ticks are saved in this browser and will be sent
-            next time you sign in.
-          </p>
+          <ErrorState
+            message="Couldn't save to your account. Your ticks are kept in this browser; Retry sends them now."
+            onRetry={retrySync}
+            focusAfterRetry="#h-checklists"
+          />
         )}
         <p className="small">
           References in grey are <strong>WCAG 2.2</strong> success criteria, our build target.

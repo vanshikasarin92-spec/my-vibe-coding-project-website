@@ -5,6 +5,7 @@ import { RA_R } from '../your-role/data/roles.js';
 import { useAccount } from './hooks/useAccount.js';
 import AuthForm from './components/AuthForm.jsx';
 import SavedSummary from './components/SavedSummary.jsx';
+import { ErrorState } from '../../shared/components/StateViews.jsx';
 
 export default function Account() {
   const {
@@ -25,6 +26,10 @@ export default function Account() {
   let body;
   if (auth.status === 'unavailable') {
     body = <p>{copy.unavailable}</p>;
+  } else if (auth.status === 'error') {
+    body = (
+      <ErrorState message={copy.authCheckFail} onRetry={auth.retry} focusAfterRetry="#h-account" />
+    );
   } else if (auth.status === 'loading') {
     body = (
       <p className="muted" aria-busy="true">

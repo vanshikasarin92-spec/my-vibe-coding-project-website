@@ -3,15 +3,13 @@
 // sender, the time and the starting status. Each function resolves to
 // { data, error } and never throws.
 import { supabase } from './supabase.js';
+import { request } from './request.js';
 
-async function run(query) {
-  if (!supabase) return { data: null, error: { message: 'Supabase is not configured.' } };
-  try {
-    const { data, error } = await query;
-    return { data, error };
-  } catch (e) {
-    return { data: null, error: { message: e.message || 'Network error' } };
-  }
+// Settles within the time limit and never throws (see request.js).
+function run(query) {
+  if (!supabase)
+    return Promise.resolve({ data: null, error: { message: 'Supabase is not configured.' } });
+  return request(query);
 }
 
 // recipient_email only: the database fills in sender_email, status and created_at.

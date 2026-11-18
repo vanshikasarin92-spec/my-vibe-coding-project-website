@@ -17,11 +17,18 @@ export default function InviteForm({ copy, onSend, siteUrl }) {
     if (attempt && inputRef.current) inputRef.current.focus();
   }, [attempt]);
 
+  // One send at a time: rapid clicks or Enter presses while a send is in
+  // flight are ignored (the database also refuses a second active invite).
+  const inFlight = useRef(false);
+
   async function submit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setCopyStatus('');
     const res = await onSend(email);
+    inFlight.current = false;
     setBusy(false);
     if (res.ok) {
       setError(null);
@@ -59,6 +66,11 @@ export default function InviteForm({ copy, onSend, siteUrl }) {
             <span className="acc-error" id="inv-email-error">
               {copy.errors[error] || copy.errors.unknown}
             </span>
+          )}
+          {error === 'network' && (
+            <button type="button" className="btn" onClick={() => submit()} disabled={busy}>
+              {copy.retry}
+            </button>
           )}
         </div>
         <button type="submit" className="btn primary" disabled={busy}>

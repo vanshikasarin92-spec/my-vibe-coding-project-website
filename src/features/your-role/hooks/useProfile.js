@@ -88,6 +88,7 @@ export function useProfile(roleIds, libraryRoleFor) {
   return {
     profile,
     syncError,
+    retrySync: pull, // pulls, merges and sends again
     restored,
     signedIn: !!userId,
     pickRole(roleId, lang) {

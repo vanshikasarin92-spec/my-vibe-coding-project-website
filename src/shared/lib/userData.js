@@ -7,17 +7,14 @@
 //      asks for anyone else's rows in the first place.
 // Every function resolves to { data, error } and never throws.
 import { supabase } from './supabase.js';
+import { request } from './request.js';
 
 const NOT_CONFIGURED = { data: null, error: { message: 'Supabase is not configured.' } };
 
-async function run(query) {
-  if (!supabase) return NOT_CONFIGURED;
-  try {
-    const { data, error } = await query;
-    return { data, error };
-  } catch (e) {
-    return { data: null, error: { message: e.message || 'Network error' } };
-  }
+// Settles within the time limit and never throws (see request.js).
+function run(query) {
+  if (!supabase) return Promise.resolve(NOT_CONFIGURED);
+  return request(query);
 }
 
 // Profile, actions done and checklist ticks for one person.

@@ -18,6 +18,7 @@ export function authErrorCode(error) {
   if (!error) return null;
   const code = error.code || '';
   const msg = (error.message || '').toLowerCase();
+  if (code === 'timeout') return 'network';
   if (code === 'invalid_credentials' || msg.includes('invalid login credentials'))
     return 'badLogin';
   if (code === 'email_not_confirmed' || msg.includes('email not confirmed')) return 'notConfirmed';

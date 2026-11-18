@@ -59,5 +59,5 @@ export function useChecklistTicks() {
     setSyncError(!!res.error);
   }
 
-  return [ticks, update, syncError];
+  return [ticks, update, syncError, pull];
 }

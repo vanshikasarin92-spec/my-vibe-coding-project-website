@@ -2,15 +2,13 @@
 // (signed in or not). Each function resolves to { data, error } and never throws;
 // the feature's logic/ turns the rows into the shape its screens use.
 import { supabase } from './supabase.js';
+import { request } from './request.js';
 
-async function run(query) {
-  if (!supabase) return { data: null, error: { message: 'Supabase is not configured.' } };
-  try {
-    const { data, error } = await query;
-    return { data, error };
-  } catch (e) {
-    return { data: null, error: { message: e.message || 'Network error' } };
-  }
+// Settles within the time limit and never throws (see request.js).
+function run(query) {
+  if (!supabase)
+    return Promise.resolve({ data: null, error: { message: 'Supabase is not configured.' } });
+  return request(query);
 }
 
 // News, in the order it was published to the hub, with sources in order.

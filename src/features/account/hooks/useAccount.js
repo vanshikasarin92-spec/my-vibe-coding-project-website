@@ -1,5 +1,5 @@
 // State for the Account page: the form, submitting, and what's saved to the account.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth, authActions } from '../../../shared/hooks/useAuth.jsx';
 import { loadUserData } from '../../../shared/lib/userData.js';
 import { validateCredentials, authErrorCode, signUpOutcome } from '../logic/credentials.js';
@@ -31,18 +31,24 @@ export function useAccount() {
     };
   }, [userId, reload]);
 
+  // One sign-up or log-in at a time: repeat clicks while one is in flight are ignored.
+  const inFlight = useRef(false);
+
   async function submit(email, password) {
+    if (inFlight.current) return { ok: false, ignored: true };
     setFormError(null);
     setNotice(null);
     const errors = validateCredentials(email, password, mode);
     setFieldErrors(errors);
     if (Object.keys(errors).length) return { ok: false, invalid: true };
+    inFlight.current = true;
     setBusy(true);
     const trimmed = email.trim();
     const result =
       mode === 'signup'
         ? await authActions.signUp(trimmed, password)
         : await authActions.logIn(trimmed, password);
+    inFlight.current = false;
     setBusy(false);
     if (result.error) {
       setFormError(authErrorCode(result.error));

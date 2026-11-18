@@ -13,7 +13,8 @@
     "test:db": "node scripts/test-db.mjs",
     "e2e:auth": "node e2e/auth.cjs",
     "build:artifact": "vite build --mode artifact --outDir dist-artifact",
-    "e2e:states": "node e2e/states.cjs"
+    "e2e:states": "node e2e/states.cjs",
+    "e2e:resilience": "node e2e/resilience.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.45.4",

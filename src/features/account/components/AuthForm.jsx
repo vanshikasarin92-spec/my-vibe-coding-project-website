@@ -25,9 +25,9 @@ export default function AuthForm({
   ].filter(Boolean);
 
   async function handleSubmit(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const result = await onSubmit(email, password);
-    if (!result.ok) setAttempt((n) => n + 1);
+    if (!result.ok && !result.ignored) setAttempt((n) => n + 1);
   }
 
   // After a failed submit, move focus to the error summary once it is on screen.
@@ -70,6 +70,11 @@ export default function AuthForm({
               <li key={m.text}>{m.id ? <a href={'#' + m.id}>{m.text}</a> : m.text}</li>
             ))}
           </ul>
+          {formError === 'network' && (
+            <button type="button" className="btn" onClick={() => handleSubmit()} disabled={busy}>
+              {copy.retry}
+            </button>
+          )}
         </div>
       )}
 

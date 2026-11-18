@@ -12,7 +12,9 @@ export const ACCOUNT_COPY = {
   showPassword: 'Show password',
   submit: { login: 'Log in', signup: 'Create account' },
   busy: { login: 'Logging in…', signup: 'Creating your account…' },
+  retry: 'Retry',
   errorSummary: 'Fix the following:',
+  authCheckFail: "We couldn't check whether you're signed in. Check your connection and try again.",
   errors: {
     emailMissing: 'Enter your email address.',
     emailFormat: 'Enter an email address like name@canadapost.ca.',

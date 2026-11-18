@@ -16,6 +16,7 @@ export function validateRecipient(email, selfEmail, alreadyInvited = []) {
 export function inviteErrorCode(error) {
   if (!error) return null;
   const msg = (error.message || '').toLowerCase();
+  if (error.code === 'timeout') return 'network';
   if (error.code === '23505' || msg.includes('duplicate')) return 'duplicate';
   if (msg.includes('invite yourself')) return 'self';
   if (msg.includes('sign in')) return 'signedOut';

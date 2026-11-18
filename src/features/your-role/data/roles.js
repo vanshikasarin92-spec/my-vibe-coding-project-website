@@ -62,7 +62,7 @@ export const RA_T = {
       "We couldn't load what's new for your role. Your requirements and next step are still below.",
     retry: 'Try again',
     syncFail:
-      "Couldn't save to your account. Your progress is saved in this browser and will be sent next time you sign in.",
+      "Couldn't save to your account. Your progress is kept in this browser; Try again sends it now.",
     daysTo: 'days to 5 Dec 2027',
     fewer: function (f) {
       return f + (f === 1 ? ' fewer than' : ' fewer than') + ' at your last visit';
@@ -130,7 +130,7 @@ export const RA_T = {
       'Impossible de charger les nouveautés pour votre rôle. Vos exigences et votre prochaine étape sont toujours ci-dessous.',
     retry: 'Réessayer',
     syncFail:
-      'Impossible d’enregistrer dans votre compte. Votre progression est enregistrée dans ce navigateur et sera envoyée à votre prochaine connexion.',
+      'Impossible d’enregistrer dans votre compte. Votre progression est conservée dans ce navigateur ; « Réessayer » l’envoie maintenant.',
     daysTo: 'jours avant le 5 déc. 2027',
     fewer: function (f) {
       return f + " de moins qu'à votre dernière visite";

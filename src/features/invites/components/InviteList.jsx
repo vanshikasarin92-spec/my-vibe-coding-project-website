@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Skeleton,
   ErrorState,
@@ -17,9 +17,24 @@ export default function InviteList({ copy, list, onCancel, onGetStarted }) {
   const rows = list.data || [];
   const p = paginate(rows, page, PAGE_SIZE);
 
+  const [failed, setFailed] = useState(null); // invite whose cancel couldn't reach the server
+  const [cancelling, setCancelling] = useState(null);
+  const inFlight = useRef(new Set()); // one cancel per invite at a time
+
   async function cancel(inv) {
-    const ok = await onCancel(inv.id);
-    setStatus(ok ? copy.cancelled(inv.recipient_email) : copy.cancelFail);
+    if (inFlight.current.has(inv.id)) return;
+    inFlight.current.add(inv.id);
+    setCancelling(inv.id);
+    setFailed(null);
+    const result = await onCancel(inv.id);
+    inFlight.current.delete(inv.id);
+    setCancelling(null);
+    if (result === 'network') {
+      setStatus('');
+      setFailed(inv);
+      return;
+    }
+    setStatus(result === 'ok' ? copy.cancelled(inv.recipient_email) : copy.cancelFail);
     const heading = document.getElementById('inv-list-h');
     if (heading) heading.focus();
   }
@@ -32,6 +47,13 @@ export default function InviteList({ copy, list, onCancel, onGetStarted }) {
       <p className="ra-status" role="status">
         {status}
       </p>
+      {failed && (
+        <ErrorState
+          message={copy.cancelNetwork(failed.recipient_email)}
+          onRetry={() => cancel(failed)}
+          focusAfterRetry="#inv-list-h"
+        />
+      )}
       {list.status === 'loading' && <Skeleton label={copy.listLoading} rows={3} lines={1} />}
       {list.status === 'error' && (
         <ErrorState message={copy.listError} onRetry={list.retry} focusAfterRetry="#inv-list-h" />
@@ -72,6 +94,7 @@ export default function InviteList({ copy, list, onCancel, onGetStarted }) {
                           className="btn"
                           aria-label={copy.cancelFor(inv.recipient_email)}
                           onClick={() => cancel(inv)}
+                          disabled={cancelling === inv.id}
                         >
                           {copy.cancel}
                         </button>

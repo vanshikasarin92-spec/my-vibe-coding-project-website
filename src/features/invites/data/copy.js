@@ -14,6 +14,7 @@ export const INVITES_COPY = {
   updated: 'Updated',
   refresh: 'Refresh',
   checking: 'Checking whether you’re signed in…',
+  authCheckFail: "We couldn't check whether you're signed in. Check your connection and try again.",
   metricsLoading: 'Loading invite figures…',
   metricsError: "We couldn't load the invite figures. Check your connection and try again.",
   formHeading: 'Invite a colleague',
@@ -51,5 +52,8 @@ export const INVITES_COPY = {
   cancel: 'Cancel',
   cancelFor: (email) => `Cancel invite to ${email}`,
   cancelled: (email) => `Invite to ${email} cancelled.`,
+  retry: 'Retry',
+  cancelNetwork: (email) =>
+    `Couldn't reach the server to cancel the invite for ${email}. Check your connection and retry.`,
   cancelFail: "Couldn't cancel. It may already be accepted. Refresh and try again.",
 };

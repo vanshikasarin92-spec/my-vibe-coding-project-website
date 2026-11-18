@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { RA_T, RA_R, RA_COPY, RA_IDS, RA_LIB, RA_PLURAL } from './data/roles.js';
+import { ErrorState } from '../../shared/components/StateViews.jsx';
 import { ACA_DEADLINES } from './data/deadlines.js';
 import { actionsFor, firstScreen } from './logic/profile.js';
 import { useProfile } from './hooks/useProfile.js';
@@ -19,8 +20,16 @@ import { copyText } from '../../shared/lib/clipboard.js';
 // screen to show and wires it up: content comes from ./data, rules from ./logic,
 // saved state from ./hooks, and each PRD screen is a component in ./screens.
 export default function YourRole() {
-  const { profile, syncError, restored, pickRole, changeLanguage, markDone, openLibraryForRole } =
-    useProfile(RA_IDS, RA_LIB);
+  const {
+    profile,
+    syncError,
+    retrySync,
+    restored,
+    pickRole,
+    changeLanguage,
+    markDone,
+    openLibraryForRole,
+  } = useProfile(RA_IDS, RA_LIB);
   const [lang, setLang] = useState(() => (profile && profile.lang === 'fr' ? 'fr' : 'en'));
   const [screen, setScreen] = useState(() => firstScreen(profile));
   const [from, setFrom] = useState('role');
@@ -183,9 +192,12 @@ export default function YourRole() {
       <div className="ra" lang={lang} ref={root}>
         {body}
         {syncError && (
-          <p className="acc-sync" role="status">
-            {t.syncFail}
-          </p>
+          <ErrorState
+            message={t.syncFail}
+            onRetry={retrySync}
+            retryLabel={t.retry}
+            focusAfterRetry="#h-role"
+          />
         )}
       </div>
       <div className="vh" role="status" aria-live="polite">
