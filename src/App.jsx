@@ -18,6 +18,7 @@ import Research from './features/research/Research.jsx';
 import Trends from './features/trends/Trends.jsx';
 import ResourceLibrary from './features/resource-library/ResourceLibrary.jsx';
 import Account from './features/account/Account.jsx';
+import Invites from './features/invites/Invites.jsx';
 
 const PAGES = {
   role: YourRole,
@@ -31,6 +32,7 @@ const PAGES = {
   trends: Trends,
   resources: ResourceLibrary,
   account: Account,
+  invites: Invites,
 };
 
 // Hash routing (#role, #news, …) keeps links from the original hub working and

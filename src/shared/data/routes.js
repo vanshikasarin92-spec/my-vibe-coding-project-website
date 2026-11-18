@@ -10,6 +10,7 @@ export const ROUTES = [
   { id: 'research', label: 'Research & data' },
   { id: 'trends', label: 'Trends' },
   { id: 'resources', label: 'Resource library' },
+  { id: 'invites', label: 'Invites' },
 ];
 
 // Pages reached from the header rather than the side menu.

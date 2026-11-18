@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase.js';
 import { session, KEYS } from '../lib/storage.js';
 import { recordVisit } from '../lib/userData.js';
+import { acceptMyInvites } from '../lib/invites.js';
 
 const AuthContext = createContext({ status: 'unavailable', user: null });
 
@@ -41,6 +42,8 @@ export function AuthProvider({ children }) {
     if (!userId || session.get(KEYS.accountVisit) === userId) return;
     session.set(KEYS.accountVisit, userId);
     recordVisit();
+    // Signing in with an invited address accepts those invites.
+    acceptMyInvites();
   }, [userId]);
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>;

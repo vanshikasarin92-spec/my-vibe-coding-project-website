@@ -32,8 +32,11 @@ await db.exec(`
   create table auth.users (id uuid primary key, email text);
   create function auth.uid() returns uuid language sql stable as
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+  create function auth.jwt() returns jsonb language sql stable as
+    $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
   grant usage on schema public, auth to anon, authenticated, service_role;
   grant execute on function auth.uid() to anon, authenticated;
+  grant execute on function auth.jwt() to anon, authenticated;
   alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
   alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `);
@@ -90,9 +93,11 @@ const A = '11111111-1111-1111-1111-111111111111',
 await db.exec(`insert into auth.users (id) values ('${A}'), ('${B}')`);
 ok('signup trigger creates a profile', (await count('profiles')) === 2);
 
+const EMAIL = {};
 const as = async (role, sub) => {
+  const claims = sub ? JSON.stringify({ sub, email: EMAIL[sub] || '' }) : '{}';
   await db.exec(
-    `reset role; select set_config('request.jwt.claim.sub', '${sub || ''}', false); set role ${role};`,
+    `reset role; select set_config('request.jwt.claim.sub', '${sub || ''}', false); select set_config('request.jwt.claims', '${claims}', false); set role ${role};`,
   );
 };
 
@@ -195,6 +200,44 @@ ok(
   "B has no What's new before a second visit",
   (await one(`select * from public.whats_new()`)).length === 0,
 );
+
+// Invites
+const C = '33333333-3333-3333-3333-333333333333';
+EMAIL[A] = 'a@example.com';
+EMAIL[B] = 'b@example.com';
+EMAIL[C] = 'c@example.com';
+await as('authenticated', A);
+await db.exec(`insert into public.invites (recipient_email, sender_email, status) values ('  C@Example.com ', 'fake@evil.test', 'accepted')`);
+const inv = (await one(`select sender_id, sender_email, recipient_email, status from public.invites`))[0];
+ok('invite: sender, email and status set by the database, not the client', inv.sender_id === A && inv.sender_email === 'a@example.com' && inv.recipient_email === 'c@example.com' && inv.status === 'pending', JSON.stringify(inv));
+await expectError('invite: cannot invite yourself', `insert into public.invites (recipient_email) values ('a@example.com')`, /cannot invite yourself/);
+await expectError('invite: one open invite per recipient', `insert into public.invites (recipient_email) values ('c@example.com')`, /unique|duplicate/);
+await expectError('invite: recipient must be an email', `insert into public.invites (recipient_email) values ('not-an-email')`, /check constraint/);
+ok('invite: direct status update changes nothing (no update policy)', (await db.query(`update public.invites set status = 'accepted'`)).affectedRows === 0);
+let m = (await one(`select * from public.invite_metrics()`))[0];
+ok('metrics: 1 sent, 1 pending, 0% accepted, mine counted', Number(m.sent) === 1 && Number(m.pending) === 1 && Number(m.acceptance_rate) === 0 && Number(m.my_sent) === 1, JSON.stringify(m));
+await as('authenticated', B);
+ok("invite: B (not sender or recipient) sees none", (await count('invites')) === 0);
+ok("invite: B cannot cancel A's invite", (await one(`select public.cancel_invite(id) as ok from (select 1 as id) x`))[0].ok === false);
+await db.exec('reset role');
+await db.exec(`insert into auth.users (id) values ('${C}')`);
+await as('authenticated', C);
+ok('invite: recipient sees the invite addressed to them', (await count('invites')) === 1);
+ok('invite: recipient signing in accepts it', (await one(`select public.accept_my_invites() as n`))[0].n === 1);
+m = (await one(`select * from public.invite_metrics()`))[0];
+ok('metrics: accepted 1, acceptance 100%, my_sent 0 for C', Number(m.accepted) === 1 && Number(m.acceptance_rate) === 100 && Number(m.my_sent) === 0, JSON.stringify(m));
+await as('authenticated', A);
+ok('invite: an accepted invite cannot be cancelled', (await one(`select public.cancel_invite(id) as ok from public.invites where recipient_email = 'c@example.com'`))[0].ok === false);
+await db.exec(`insert into public.invites (recipient_email) values ('d@example.com')`);
+ok('invite: sender cancels a pending invite', (await one(`select public.cancel_invite(id) as ok from public.invites where recipient_email = 'd@example.com'`))[0].ok === true);
+await db.exec(`insert into public.invites (recipient_email) values ('d@example.com')`);
+ok('invite: can invite again after cancelling', (await count('invites')) === 3);
+m = (await one(`select * from public.invite_metrics()`))[0];
+ok('metrics: cancelled excluded from the acceptance rate (1 of 2 = 50%)', Number(m.cancelled) === 1 && Number(m.acceptance_rate) === 50, JSON.stringify(m));
+await as('anon');
+ok('invite: anon sees no invites', (await count('invites')) === 0);
+await expectError('invite: anon cannot read metrics', `select * from public.invite_metrics()`, /permission denied/);
+await expectError('invite: anon cannot send', `insert into public.invites (recipient_email) values ('e@example.com')`, /row-level security|permission denied|Sign in/);
 
 await db.exec('reset role');
 ok('events are stored (dashboard view)', (await count('events')) === 1);

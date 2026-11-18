@@ -1678,3 +1678,79 @@ footer.site {
   padding: 0 var(--sp-1);
   color: var(--muted);
 }
+
+/* Invites: dashboard tiles and table ---------------------------------------- */
+.inv-dash-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-4);
+}
+.inv-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0;
+}
+.inv-tile {
+  border: 1px solid var(--line);
+  border-top: var(--sp-1) solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--white);
+  padding: var(--sp-3) var(--sp-4);
+  min-width: 0;
+}
+.inv-tile dt {
+  font-size: var(--s-sm);
+  color: var(--muted);
+}
+.inv-tile dd {
+  margin: var(--sp-1) 0 0;
+  display: grid;
+  gap: var(--sp-1);
+}
+.inv-value {
+  font-size: 1.75rem;
+  font-weight: var(--w-bold);
+  color: var(--g-111);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.inv-note {
+  font-size: var(--s-xs);
+  color: var(--muted);
+}
+.inv-share {
+  display: grid;
+  gap: var(--sp-2);
+}
+.inv-share h4 {
+  margin: 0;
+}
+.inv-table td,
+.inv-table th {
+  vertical-align: middle;
+}
+.inv-status {
+  display: inline-block;
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius);
+  font-size: var(--s-xs);
+  font-weight: var(--w-med);
+  border: 1px solid var(--line);
+  color: var(--g-111);
+  background: var(--white);
+}
+.inv-status.inv-pending {
+  background: var(--amber-tint);
+  border-color: var(--amber);
+}
+.inv-status.inv-accepted {
+  background: var(--green-tint);
+  border-color: var(--green);
+}
+.inv-status.inv-cancelled {
+  color: var(--g-333);
+  background: var(--g-f0);
+}

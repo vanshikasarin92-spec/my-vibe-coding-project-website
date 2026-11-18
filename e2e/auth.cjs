@@ -83,6 +83,8 @@ const ok = (n, c, x = '') => { c ? pass++ : fail++; console.log(c ? 'PASS' : 'FA
   const readsScoped = reads.length > 0 && reads.every(s => s.query.includes((s.table === 'profiles' ? 'id' : 'user_id') + '=eq.' + UID));
   ok('every read is filtered to the signed-in id', readsScoped, `(${reads.length} reads)`);
   const writesScoped = writes.length > 0 && writes.every(s => {
+    // RPCs (start_visit, accept_my_invites) send no user id: the database uses the session.
+    if (['start_visit', 'accept_my_invites'].includes(s.table)) return !(s.body || '').includes('user_id');
     if (s.method === 'PATCH') return s.query.includes('id=eq.' + UID);
     const rows = [].concat(JSON.parse(s.body || '[]'));
     return rows.length > 0 && rows.every(r => r.user_id === UID);

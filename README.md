@@ -136,6 +136,13 @@ Signing in is optional. Without an account everything works as before and is sav
 
 Artifact pages can't make network requests to outside services, so `npm run build:artifact` builds with Supabase switched off (`.env.artifact`): the site runs on its bundled content, keeps progress in the browser, and hides Sign in. Accounts and live content need the regular build (`npm run build`) on a real web address.
 
+## Invites and the invites dashboard
+
+- **Page:** `#invites` (side menu "Invites"), signed-in people only. Invite a colleague by email, see your invites with their status, and cancel pending ones. The hub doesn't send email: after saving an invite it gives you a message to copy and send yourself.
+- **Table:** `invites` (`sender_email`, `recipient_email`, `status` pending / accepted / cancelled, `created_at` as the timestamp, plus `sender_id` and `responded_at`), migration `20261117000400_invites.sql`. The database sets the sender, their email, the status and the time on insert, so the browser can't fake them.
+- **Who sees what:** senders see the invites they sent; recipients see invites addressed to their email; nobody else sees any. Status changes only through `cancel_invite()` (sender, pending only) and `accept_my_invites()` (called on sign-in: an invite is accepted when the recipient signs in with that address).
+- **Dashboard:** five figures (sent, accepted, acceptance rate, pending, sent in the last 7 days) come from `invite_metrics()`, which counts the table on every call. Hub-wide totals only, no names or addresses, signed-in people only. Acceptance rate = accepted ÷ invites not cancelled.
+
 ## Hosting
 
 **Live site:** https://vanshikasarin92-spec.github.io/my-vibe-coding-project-website/ (GitHub Pages, from the `gh-pages` branch of this repository).
