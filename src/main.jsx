@@ -1,0 +1,14 @@
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './shared/styles/tokens.css';
+import './shared/styles/app.css';
+import App from './App.jsx';
+import { AuthProvider } from './shared/hooks/useAuth.jsx';
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </StrictMode>,
+);

@@ -1,0 +1,74 @@
+/* Design tokens: Mercury palette (Canada Post), Roboto, 4px spacing, 4px corners. Single light theme. */
+/* Layout unchanged: sticky section rail + one view per section.
+   Components follow Canada Post's Mercury system: published palette, Roboto, 1em base with 4px steps,
+   red filled primary buttons, thin-bordered secondary buttons, blue text links, blue focus box,
+   16px between grouped buttons, full-width stacked buttons on mobile. Single light theme (Mercury has no dark palette). */
+:root {
+  color-scheme: light;
+  /* Mercury primary palette */
+  --red: #ca261a;
+  --red-2: #d55148;
+  --red-tint: #f9e9e8;
+  --blue: #0467c6;
+  --blue-2: #3685d1;
+  --blue-3: #9bc2e8;
+  --blue-tint: #e5eff9;
+  --blue-dark: #004990;
+  --g-111: #111111;
+  --g-333: #333333;
+  --g-666: #666666;
+  --g-cb: #cbcbcb;
+  --g-d9: #d9d9d9;
+  --g-e5: #e5e5e5;
+  --g-f0: #f0f0f0;
+  --white: #ffffff;
+  /* Mercury secondary palette */
+  --green: #098a00;
+  --green-tint: #e6f3e5;
+  --amber: #ffbf05;
+  --amber-tint: #ffefc0;
+
+  /* Roles */
+  --paper: var(--white);
+  --surface: var(--white);
+  --subtle: var(--g-f0);
+  --heading: var(--g-111);
+  --ink: var(--g-333);
+  --muted: var(--g-666);
+  --line: var(--g-cb);
+  --line-soft: var(--g-e5);
+  --tint: var(--blue-tint);
+  --accent: var(--blue);
+  --accent-hover: var(--blue-dark);
+  --brand: var(--red);
+  --focus: var(--blue);
+  --ok: var(--green);
+  --ok-bg: var(--green-tint);
+  --warn-bg: var(--amber-tint);
+  --warn-edge: var(--amber);
+  --crit: var(--red);
+  --crit-bg: var(--red-tint);
+
+  --f-body: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --f-mono: 'Roboto Mono', ui-monospace, Menlo, Consolas, monospace;
+  --s-xs: 0.875rem;
+  --s-sm: 1rem;
+  --s-md: 1rem;
+  --s-lg: 1.25rem;
+  --s-xl: 1.75rem;
+  --s-xxl: clamp(2rem, 4.5vw, 2.5rem);
+  --w-reg: 400;
+  --w-med: 500;
+  --w-bold: 700;
+
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.25rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-10: 2.5rem;
+  --sp-12: 3rem;
+  --radius: 4px;
+}

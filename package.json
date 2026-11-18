@@ -1,0 +1,28 @@
+{
+  "name": "accessible-by-default",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Digital Accessibility Hub for Design & Engineering",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test \"src/**/*.test.js\"",
+    "db:seed": "node scripts/generate-seed.mjs",
+    "test:db": "node scripts/test-db.mjs",
+    "e2e:auth": "node e2e/auth.cjs",
+    "build:artifact": "vite build --mode artifact --outDir dist-artifact",
+    "e2e:states": "node e2e/states.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.2.17",
+    "@vitejs/plugin-react": "4.3.4",
+    "vite": "5.4.11"
+  }
+}
