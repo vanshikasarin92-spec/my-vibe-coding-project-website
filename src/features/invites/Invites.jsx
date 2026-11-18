@@ -6,7 +6,7 @@ import { useInvites } from './hooks/useInvites.js';
 import MetricTiles from './components/MetricTiles.jsx';
 import InviteForm from './components/InviteForm.jsx';
 import InviteList from './components/InviteList.jsx';
-import { EmptyState } from '../../shared/components/StateViews.jsx';
+import { EmptyState, Skeleton } from '../../shared/components/StateViews.jsx';
 
 export default function Invites() {
   const { auth, metrics, list, send, cancel, refresh, siteUrl } = useInvites();
@@ -15,7 +15,7 @@ export default function Invites() {
   if (auth.status === 'unavailable') {
     body = <p>{copy.unavailable}</p>;
   } else if (auth.status === 'loading') {
-    body = null;
+    body = <Skeleton label={copy.checking} rows={1} lines={3} />;
   } else if (auth.status !== 'signed-in') {
     body = (
       <EmptyState

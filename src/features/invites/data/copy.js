@@ -13,6 +13,7 @@ export const INVITES_COPY = {
     'Totals for the whole hub, calculated from the invites table when this page loads.',
   updated: 'Updated',
   refresh: 'Refresh',
+  checking: 'Checking whether you’re signed in…',
   metricsLoading: 'Loading invite figures…',
   metricsError: "We couldn't load the invite figures. Check your connection and try again.",
   formHeading: 'Invite a colleague',
