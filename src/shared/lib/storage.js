@@ -46,4 +46,5 @@ export const KEYS = {
   tab: 'abd-tab', // Last platform tab
   visit: 'abd-visit', // Session flag so a visit is counted once per browser session
   accountVisit: 'abd-account-visit', // Same, for the signed-in person's account
+  analytics: 'abd-analytics', // Anonymous visitor and visit ids for page-view counts
 };

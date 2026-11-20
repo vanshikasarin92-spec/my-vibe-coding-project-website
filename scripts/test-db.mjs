@@ -241,5 +241,46 @@ await expectError('invite: anon cannot send', `insert into public.invites (recip
 
 await db.exec('reset role');
 ok('events are stored (dashboard view)', (await count('events')) === 1);
+// Analytics: anonymous page views -----------------------------------------------
+const V1 = 'aaaaaaaa-0000-4000-8000-000000000001', V2 = 'aaaaaaaa-0000-4000-8000-000000000002';
+const S1 = 'bbbbbbbb-0000-4000-8000-000000000001', S2 = 'bbbbbbbb-0000-4000-8000-000000000002';
+const P = (n) => `cccccccc-0000-4000-8000-00000000000${n}`;
+await as('anon');
+await db.exec(`insert into public.page_views (id, visitor_id, session_id, page, started_at, duration_ms) values
+  ('${P(1)}', '${V1}', '${S1}', 'role', now() - interval '300 days', 999999),
+  ('${P(2)}', '${V1}', '${S1}', 'news', now(), null),
+  ('${P(3)}', '${V2}', '${S2}', 'role', now(), null)`);
+ok('page views: anon can record views but cannot read them', (await count('page_views')) === 0);
+await expectError('page views: page name must be a route id', `insert into public.page_views (id, visitor_id, session_id, page) values ('${P(4)}', '${V1}', '${S1}', '<script>')`, /check constraint/);
+await db.exec(`select public.end_page_view('${P(1)}', '${V1}', 60000), public.end_page_view('${P(2)}', '${V1}', 30000), public.end_page_view('${P(3)}', '${V2}', 5000)`);
+await db.exec(`select public.end_page_view('${P(1)}', '${V2}', 1700000)`); // wrong visitor
+await db.exec(`select public.end_page_view('${P(2)}', '${V1}', 10000)`); // smaller: ignored
+await expectError('analytics: anon cannot read totals', `select public.site_analytics(30)`, /permission denied/);
+await db.exec('reset role');
+const rows = await one(`select id, started_at > now() - interval '1 minute' as fresh, duration_ms from public.page_views order by id`);
+ok('page views: server sets the time, ignoring what the browser sent', rows.every((r) => r.fresh), JSON.stringify(rows));
+ok('page views: time on page recorded; wrong visitor and smaller values ignored', rows.map((r) => r.duration_ms).join() === '60000,30000,5000', rows.map((r) => r.duration_ms).join());
+await db.exec(`select public.end_page_view('${P(3)}', '${V2}', 99999999)`);
+ok('page views: time on page capped at 30 minutes', (await one(`select duration_ms from public.page_views where id = '${P(3)}'`))[0].duration_ms === 1800000);
+await db.exec(`update public.page_views set duration_ms = 5000 where id = '${P(3)}'`);
+await db.exec(`insert into public.page_views (id, visitor_id, session_id, page) values ('${P(5)}', '${V2}', '${S2}', 'role')`);
+await db.exec(`update public.page_views set started_at = now() - interval '35 days', session_id = '${S1}' where id = '${P(5)}'`); // previous period
+await as('authenticated', A);
+const an = (await one(`select public.site_analytics(30) as j`))[0].j;
+const c = an.current, pr = an.previous;
+ok('analytics: visitors 2, page views 3, visits 2', c.visitors === 2 && c.page_views === 3 && c.visits === 2, JSON.stringify(c));
+ok('analytics: views per visit 1.5, avg visit 47.5s, bounce 50%', Number(c.views_per_visit) === 1.5 && Number(c.avg_visit_ms) === 47500 && Number(c.bounce_rate) === 50, JSON.stringify(c));
+ok('analytics: previous period counted separately', pr.visitors === 1 && pr.page_views === 1 && Number(pr.bounce_rate) === 100, JSON.stringify(pr));
+ok('analytics: 30-day series ending today holds the 3 views', an.series.length === 30 && an.series.at(-1).page_views === 3 && an.series.reduce((t, d) => t + d.page_views, 0) === 3);
+ok('analytics: top pages, most viewed first', an.pages[0].page === 'role' && an.pages[0].page_views === 2 && an.pages[0].visitors === 2, JSON.stringify(an.pages));
+const empty = (await one(`select public.site_analytics(1) as j`))[0].j;
+ok('analytics: range is clamped and no row details leak', Object.keys(an).sort().join() === 'as_of,current,days,pages,previous,series' && empty.days === 1);
+await db.exec('reset role');
+await db.exec('delete from public.page_views');
+await as('authenticated', A);
+const none = (await one(`select public.site_analytics(7) as j`))[0].j.current;
+ok('analytics: no data gives zeros and empty rates, not errors', none.visitors === 0 && none.page_views === 0 && none.visits === 0 && none.views_per_visit === null && none.bounce_rate === null, JSON.stringify(none));
+await db.exec('reset role');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

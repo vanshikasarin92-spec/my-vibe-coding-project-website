@@ -7,6 +7,7 @@ import { ROUTES, EXTRA_ROUTES, DEFAULT_ROUTE } from './shared/data/routes.js';
 import { SITE } from './shared/data/site.js';
 import { pageTitle } from './shared/logic/navigation.js';
 import { useHashRoute } from './shared/hooks/useHashRoute.js';
+import { usePageTracking } from './shared/hooks/usePageTracking.js';
 import YourRole from './features/your-role/YourRole.jsx';
 import Overview from './features/overview/Overview.jsx';
 import News from './features/news/News.jsx';
@@ -19,6 +20,7 @@ import Trends from './features/trends/Trends.jsx';
 import ResourceLibrary from './features/resource-library/ResourceLibrary.jsx';
 import Account from './features/account/Account.jsx';
 import Invites from './features/invites/Invites.jsx';
+import Analytics from './features/analytics/Analytics.jsx';
 
 const PAGES = {
   role: YourRole,
@@ -33,6 +35,7 @@ const PAGES = {
   resources: ResourceLibrary,
   account: Account,
   invites: Invites,
+  analytics: Analytics,
 };
 
 // Hash routing (#role, #news, …) keeps links from the original hub working and
@@ -41,6 +44,7 @@ const ROUTE_IDS = Object.keys(PAGES);
 
 export default function App() {
   const view = useHashRoute(ROUTE_IDS, DEFAULT_ROUTE);
+  usePageTracking(view); // anonymous page-view counts for #analytics
   const firstRender = useRef(true);
 
   useEffect(() => {
