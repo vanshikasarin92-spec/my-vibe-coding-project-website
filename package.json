@@ -8,14 +8,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"src/**/*.test.js\"",
+    "test": "node --test \"src/**/*.test.js\" \"scripts/*.test.mjs\"",
     "db:seed": "node scripts/generate-seed.mjs",
     "test:db": "node scripts/test-db.mjs",
     "e2e:auth": "node e2e/auth.cjs",
     "build:artifact": "vite build --mode artifact --outDir dist-artifact",
     "e2e:states": "node e2e/states.cjs",
     "e2e:resilience": "node e2e/resilience.cjs",
-    "e2e:analytics": "node e2e/analytics.cjs"
+    "e2e:analytics": "node e2e/analytics.cjs",
+    "e2e:workflow": "node e2e/workflow.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.45.4",

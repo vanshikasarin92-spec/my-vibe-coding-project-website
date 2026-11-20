@@ -9,6 +9,7 @@ export default function RoleView({
   onChangeRole,
   onLibrary,
   actionCard,
+  checklist,
   languageSwitch,
 }) {
   return (
@@ -56,6 +57,7 @@ export default function RoleView({
           <a className="ra-link" href="#resources" onClick={onLibrary}>
             {t.libLink} →
           </a>
+          {checklist}
         </section>
         <div className="ra-side">
           <section className="ra-sec" aria-labelledby="ra-wh">

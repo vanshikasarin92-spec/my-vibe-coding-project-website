@@ -1915,3 +1915,25 @@ footer.site {
 .an-link {
   overflow-wrap: anywhere;
 }
+
+/* Your role: ticket preview and done-checklist */
+.ra-ticket {
+  margin-top: var(--sp-3);
+  display: grid;
+  gap: var(--sp-2);
+}
+.ra-ticket summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.ra-ticket pre {
+  margin-top: var(--sp-2);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ra-dod {
+  margin-top: var(--sp-6);
+}
+.ra-dod-list li + li {
+  margin-top: var(--sp-1);
+}

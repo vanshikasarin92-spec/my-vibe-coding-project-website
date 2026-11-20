@@ -11,6 +11,9 @@ import DoThisNow from './screens/DoThisNow.jsx';
 import DoThisNext from './screens/DoThisNext.jsx';
 import ActionDone from './screens/ActionDone.jsx';
 import WelcomeBack from './screens/WelcomeBack.jsx';
+import DoneChecklist from './components/DoneChecklist.jsx';
+import { TICKET_T, RA_DOD, RA_COPY_KIND } from './data/tickets.js';
+import { hubLink, roleFromSearch, detailLines, ticketText, checklistText } from './logic/ticket.js';
 import ActionCard from './components/ActionCard.jsx';
 import LanguageSwitch from './components/LanguageSwitch.jsx';
 import { daysUntil, daysSince, formatDate, formatDayMonth } from '../../shared/logic/dates.js';
@@ -36,9 +39,12 @@ export default function YourRole() {
   const [kind, setKind] = useState('do');
   const [open, setOpen] = useState({});
   const [status, setStatus] = useState('');
+  const [dodStatus, setDodStatus] = useState('');
   const news = useWhatsNew(profile && profile.role, profile && profile.prevVisit);
   const root = useRef(null);
   const preRef = useRef(null);
+  const ticketRef = useRef(null);
+  const dodRef = useRef(null);
   const focusNext = useRef(null);
 
   // Move focus after a screen change: to the new heading, or back to the control that was used.
@@ -58,6 +64,25 @@ export default function YourRole() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restored]);
 
+  // Opened from a ticket or checklist link (?role=dev&src=ticket#role): someone
+  // without a saved role lands on that role. A saved role is kept. The query is
+  // then removed so a reload or bookmark doesn't repeat it.
+  useEffect(() => {
+    const linked = roleFromSearch(window.location.search, RA_IDS);
+    if (window.location.search) {
+      try {
+        window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+      } catch (e) {
+        /* history unavailable */
+      }
+    }
+    if (linked && !(profile && profile.role)) {
+      pickRole(linked, lang);
+      go('role');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Another tab or device changed the language (last-write-wins): follow it.
   const savedLang = profile && profile.lang;
   useEffect(() => {
@@ -71,10 +96,29 @@ export default function YourRole() {
   const acts = actionsFor(profile);
   const days = { y2027: daysUntil(ACA_DEADLINES.y2027), y2028: daysUntil(ACA_DEADLINES.y2028) };
   const fmt = (ts) => formatDate(ts, t.months);
+  const L = TICKET_T[lang];
+  const base = window.location.origin + window.location.pathname;
+
+  // The action on screen as a ticket for the team's tracker.
+  function ticketFor(k) {
+    const isDo = k === 'do';
+    const a = isDo ? r.act : r.nx;
+    const detailText = isDo && RA_COPY[id] ? RA_COPY[id][lang] || RA_COPY[id].en : '';
+    return ticketText({
+      L,
+      title: isDo ? r.doTitle : r.nx.title,
+      why: isDo ? r.doSub : r.nx.sub,
+      byWhen: `${t.y27}: ${r.d27}`,
+      steps: a.steps,
+      details: detailLines(detailText, RA_COPY_KIND[id], id === 'dev' ? 'ts' : ''),
+      link: hubLink(base, id, 'ticket'),
+    });
+  }
 
   function go(next, focusSel = '#h-role') {
     setScreen(next);
     setStatus('');
+    setDodStatus('');
     focusNext.current = focusSel;
   }
   function switchLang() {
@@ -124,6 +168,22 @@ export default function YourRole() {
         onChangeRole={() => go('picker')}
         onLibrary={openLibraryForRole}
         actionCard={actionCard(false)}
+        checklist={
+          RA_DOD[id] && (
+            <DoneChecklist
+              dod={RA_DOD[id][lang]}
+              L={L}
+              status={dodStatus}
+              preRef={dodRef}
+              onCopy={() =>
+                copyText(
+                  checklistText({ L, dod: RA_DOD[id][lang], link: hubLink(base, id, 'checklist') }),
+                  dodRef.current,
+                ).then((ok) => setDodStatus(ok ? L.dodCopied : t.copyFail))
+              }
+            />
+          )
+        }
         languageSwitch={languageSwitch}
       />
     );
@@ -139,6 +199,15 @@ export default function YourRole() {
       onFinish: () => {
         markDone(kind);
         go('done');
+      },
+      ticket: {
+        L,
+        text: ticketFor(kind),
+        preRef: ticketRef,
+        onCopy: () =>
+          copyText(ticketFor(kind), ticketRef.current).then((ok) =>
+            setStatus(ok ? L.copiedTicket : t.copyFail),
+          ),
       },
       languageSwitch,
     };

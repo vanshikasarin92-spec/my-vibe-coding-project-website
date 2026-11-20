@@ -1,5 +1,6 @@
 // Shared layout for the Do this now and Do this next screens: steps, optional
-// text to copy, and the done button.
+// text to copy, "Copy as ticket" (the action as a ticket with a link back to
+// the hub), and the done button.
 export default function ActionSteps({
   eyebrow,
   title,
@@ -12,6 +13,7 @@ export default function ActionSteps({
   onBack,
   onCopy,
   onFinish,
+  ticket,
   languageSwitch,
 }) {
   return (
@@ -50,6 +52,17 @@ export default function ActionSteps({
             {action.copyBtn}
           </button>
         )}
+        {ticket && (
+          <button
+            type="button"
+            className="btn"
+            data-act="ticket"
+            aria-describedby="ra-ticket-hint"
+            onClick={ticket.onCopy}
+          >
+            {ticket.L.copyTicket}
+          </button>
+        )}
         <button type="button" className="btn primary" onClick={onFinish}>
           {action.doneBtn}
         </button>
@@ -57,6 +70,19 @@ export default function ActionSteps({
           {status}
         </span>
       </div>
+      {ticket && (
+        <div className="ra-ticket">
+          <p id="ra-ticket-hint" className="small muted">
+            {ticket.L.ticketHint}
+          </p>
+          <details>
+            <summary>{ticket.L.preview}</summary>
+            <pre ref={ticket.preRef} className="ra-pre" lang={copyLang}>
+              {ticket.text}
+            </pre>
+          </details>
+        </div>
+      )}
     </>
   );
 }

@@ -16,6 +16,7 @@ npm run e2e:auth # browser test for accounts (with npm run preview running)
 npm run e2e:states # browser test for loading/error/empty states, pagination, last-write-wins
 npm run e2e:resilience # hung requests end in an inline error with Retry; rapid clicks don't duplicate
 npm run e2e:analytics # Analytics page: tiles, chart hover/keyboard, table, empty/error states
+npm run e2e:workflow # Copy as ticket, done-checklists, ticket links back, What's new when signed out
 npm run build:artifact # build for a claude.ai artifact (Supabase off)
 ```
 
@@ -164,3 +165,11 @@ The **Analytics** page (`#analytics`, signed-in only) shows visitors, page views
 - **Privacy:** no names, emails or IP addresses. Each browser keeps a random id in local storage. Nobody can read rows from the browser; the page reads totals only, through `site_analytics()`.
 - **Not counted:** localhost, test automation (`navigator.webdriver`), and browsers sending Do Not Track or Global Privacy Control.
 - **Migration:** `supabase/migrations/20261120000500_page_views.sql`.
+
+## Taking the hub into the work
+
+- **Copy as ticket** (Do this now and Do this next): the action as Markdown for Jira, Azure DevOps or GitHub, with "Why", "By when", "Done when" checkboxes, the role's snippet or criteria, and a link back to the hub (`?role=<id>&src=ticket#role`). A preview shows exactly what is copied.
+- **Done-checklist per role** (on the role view): pull request checklist (developer), handoff checklist (designer), definition of done (product owner), test checklist (QA), procurement and release checklists, in English and French, each line tied to a WCAG criterion or EN 301 549 clause. "Copy checklist" adds a link back (`src=checklist`).
+- **Links back:** someone with no saved role lands on the linked role; a saved role is kept. The query is removed from the address after it's read.
+- **What's new** works without signing in (the last visit is kept in the browser) and now reads the live news in Supabase, falling back to the bundled news if Supabase can't be reached.
+- Text: `src/features/your-role/data/tickets.js`. Rules: `src/features/your-role/logic/ticket.js`.
