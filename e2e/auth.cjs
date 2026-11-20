@@ -15,8 +15,8 @@ const ok = (n, c, x = '') => { c ? pass++ : fail++; console.log(c ? 'PASS' : 'FA
   // 1. Signed out: header link, form, validation (no network needed)
   let ctx = await b.newContext({ ignoreHTTPSErrors: true }); let p = await ctx.newPage(); track(p);
   await p.goto(BASE + '#role'); await p.waitForSelector('#h-role');
-  ok('header shows Sign in', (await p.textContent('.acc-link')).trim() === 'Sign in');
-  await p.click('.acc-link'); await p.waitForSelector('#h-account');
+  ok('header shows Sign in', (await p.textContent('.acc-link[href="#account"]')).trim() === 'Sign in');
+  await p.click('.acc-link[href="#account"]'); await p.waitForSelector('#h-account');
   ok('account page title', (await p.title()).startsWith('Your account'));
   await p.click('button[type=submit]');
   await p.waitForSelector('.acc-errors');
@@ -64,7 +64,7 @@ const ok = (n, c, x = '') => { c ? pass++ : fail++; console.log(c ? 'PASS' : 'FA
   await p.waitForSelector('.acc-saved', { timeout: 10000 });
   const summary = (await p.innerText('.acc-saved')).replace(/\s+/g, ' ');
   ok('signed in: summary shows own saved records', summary.includes('Product owner') && /Actions done 1/.test(summary) && /ticked 1/.test(summary), '| ' + summary);
-  ok('header switches to Your account', (await p.textContent('.acc-link')).trim() === 'Your account');
+  ok('header switches to Your account', (await p.textContent('.acc-link[href="#account"]')).trim() === 'Your account');
 
   // Your role: account restores the profile on this empty browser
   await p.goto(BASE + '#role'); await p.waitForSelector('#h-role');

@@ -38,6 +38,15 @@ export default function Layout({ view, children }) {
             {auth.status !== 'unavailable' && (
               <a
                 className="acc-link"
+                href="#analytics"
+                aria-current={view === 'analytics' ? 'page' : undefined}
+              >
+                {SITE.analytics}
+              </a>
+            )}
+            {auth.status !== 'unavailable' && (
+              <a
+                className="acc-link"
                 href="#account"
                 aria-current={view === 'account' ? 'page' : undefined}
               >

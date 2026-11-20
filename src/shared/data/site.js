@@ -4,6 +4,7 @@ export const SITE = {
   name: 'Accessible by Default',
   eyebrow: 'Design & Engineering · Digital accessibility hub',
   updated: 'Updated 3 Nov 2026',
+  analytics: 'Analytics', // header link to #analytics
   account: { signIn: 'Sign in', signedIn: 'Your account' },
   chips: [
     { text: 'ACA standard: CAN/ASC-EN 301 549:2024', kind: 'req' },
